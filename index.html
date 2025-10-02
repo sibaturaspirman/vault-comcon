@@ -3,12 +3,12 @@
 <html>
 <head>
 	<title>VAULT</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 	<link rel="shortcut icon" href="assets/images/favicon.png"/>
 	<meta name="description" content="VAULT" />
     <link rel="stylesheet" href="css/main.css">
-    <link rel="manifest" href="manifest.json" />
     
     <script src="js/libs.min.js"></script>
     
@@ -62,11 +62,11 @@
     
     <div class="main hide" id="pageGameplay">
         <div class="main__content gameplay">
-            <div class="block-image" style="width: 90%;"><img src="./assets/images/N-FRAME.png" alt="IQOS" /></div>
+            <div class="block-image" style="width: 100%;"><img src="./assets/images/N-FRAME.png" alt="IQOS" /></div>
             <div class="gameplay-content">
                 <div class="gameplay-q">
                     <p>QUESTION</p>
-                    <h4 id="question">-</h4>
+                    <h4 id="question" style="width: 96%;margin: 14px auto 0;">-</h4>
                 </div>
                 <div class="gameplay-slot gameplayAnswer" id="gamePlayAnswer"></div>
                 <div class="gameplay-slot gameplayAnswer" id="gamePlayAnswerBottom"></div>
@@ -182,18 +182,10 @@
         </div>
         
         <div id="commandStatus" style="margin-top: 20px; padding: 10px; background-color: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">Ready to send commands...</div>
+
+        <button id="closeSerial">CLOSE SERIAL</button>
     </div>
 
-    <script type="text/javascript" src="js/app-default.js"></script>
-
-
-    <script>
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('sw.js')
-            .then(() => console.log('✅ Service Worker Registered v0.2'))
-            .catch(err => console.error('❌ SW registration failed:', err));
-        }
-    </script>
     <script>
         let port;
         let writer;
@@ -284,10 +276,16 @@
         document.getElementById('ledGreen').addEventListener('click', () => sendCommand('led_green'));
         document.getElementById('displayLeft').addEventListener('click', () => sendCommand('display_left'));
         document.getElementById('displayRight').addEventListener('click', () => sendCommand('display_right'));
+        document.getElementById('closeSerial').addEventListener('click', () => {
+            document.getElementById('pageSerial').classList.add('hide');
+        });
+        
     
         // Start auto-connect on page load
         window.addEventListener('load', tryAutoConnect);
       </script>
+      
+        <script type="text/javascript" src="js/app-default.js"></script>
     
 </body>
 </html>

@@ -704,7 +704,8 @@ function showKisi(){
 
     if(guess.join('') === secret.join('')){
       statusEl.textContent = `Berhasil! Kode: ${secret.join('')}`;
-      alert(`Berhasil! Kode: ${secret.join('')}`); // ✅ ALERT DI SINI
+      // alert(`Berhasil! Kode: ${secret.join('')}`); // ✅ ALERT DI SINI
+      sendCommand('down_max')
       locked = true;
       return;
     }
