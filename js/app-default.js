@@ -620,6 +620,7 @@ function showKisi(){
 
   function initBoard(){
     console.log(secret)
+    $('#debugBuka').html(secret)
     board.innerHTML = '';
     for(let r = 0; r < maxRows; r++){
       for(let c = 0; c < digitsPerRow; c++){
