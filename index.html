@@ -157,7 +157,7 @@
 
 
     <!-- TEST SERIAL -->
-    <div class="main hidex serial" id="pageSerial" style="background-color: #000;">
+    <div class="main hide serial" id="pageSerial" style="background-color: #000;">
         <h1>Arduino Control Panel</h1>
         <button id="connectButton">Connect to Arduino</button>
         <div id="status">Attempting to connect...</div>
@@ -184,6 +184,19 @@
         <div id="commandStatus" style="margin-top: 20px; padding: 10px; background-color: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">Ready to send commands...</div>
 
         <button id="closeSerial">CLOSE SERIAL</button>
+    </div>
+
+    
+    <div class="main hidex serial" id="pageSerial2" style="background-color: #000;">
+        <h1>Arduino Control Panel</h1>
+        <button id="connectButton">Connect to Arduino</button>
+        <div id="status">Attempting to connect...</div>
+
+        <div style="margin-top: 30px;">
+            <h2 style="text-align: center;">PLAYER</h2>
+            <button id="player1">P1</button>
+            <button id="player2">P2</button>
+        </div>
     </div>
 
     <script>

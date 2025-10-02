@@ -1,0 +1,176 @@
+<!-- //v0.0.1...................................................antigravity.id..........................................................-->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>VAULT</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<link rel="shortcut icon" href="assets/images/favicon.png"/>
+	<meta name="description" content="VAULT" />
+    <link rel="stylesheet" href="css/main.css">
+    
+    <script src="js/libs.min.js"></script>
+    
+
+</head>
+<body>
+
+    <!-- TEST SERIAL -->
+    
+    <div class="main hidex serial" id="pageSerial2" style="background-color: #000;">
+        <h1>Arduino Control Panel</h1>
+        <button id="connectButton">Connect to Arduino</button>
+        <div id="status">Attempting to connect...</div>
+        <div id="buttonStatus">Waiting for button data...</div>
+
+        <div style="margin-top: 30px;">
+            <h2 style="text-align: center;">PLAYER</h2>
+            <button id="player1">P1 <span id="p1Data">0</span></button>
+            <button id="player2">P2 <span id="p2Data">0</span></button>
+        </div>
+    </div>
+
+    <script>
+        // INTEGRASI ARDUINO
+        let port;
+        let reader;
+        let keepReading = false;
+
+        let p1Data = 0, p2Data = 0
+
+        const connectButton = document.getElementById('connectButton');
+        const statusDiv = document.getElementById('status');
+        const buttonStatusDiv = document.getElementById('buttonStatus');
+
+        // Attempt to auto-connect to previously authorized port
+        async function tryAutoConnect() {
+            try {
+                const ports = await navigator.serial.getPorts();
+                if (ports.length > 0) {
+                    port = ports[0]; // Use the first authorized port
+                    await port.open({ baudRate: 9600 });
+                    statusDiv.textContent = 'Auto-Connected to Arduino';
+                    connectButton.textContent = 'Disconnect';
+                    keepReading = true;
+                    readSerialData();
+                } else {
+                    statusDiv.textContent = 'No authorized ports found. Click Connect to select.';
+                }
+            } catch (error) {
+            statusDiv.textContent = `Auto-Connect Error: ${error.message}. Click Connect.`;
+            }
+        }
+
+        // Handle manual connect/disconnect
+        connectButton.addEventListener('click', async () => {
+            if (!port) {
+                try {
+                    port = await navigator.serial.requestPort({});
+                    await port.open({ baudRate: 9600 });
+                    statusDiv.textContent = 'Connected to Arduino';
+                    connectButton.textContent = 'Disconnect';
+                    keepReading = true;
+                    readSerialData();
+                } catch (error) {
+                    statusDiv.textContent = `Error: ${error.message}`;
+                }
+            } else {
+                keepReading = false;
+                if (reader) {
+                    await reader.cancel();
+                    reader = null;
+                }
+                await port.close();
+                port = null;
+                statusDiv.textContent = 'Disconnected';
+                connectButton.textContent = 'Connect to Arduino';
+                buttonStatusDiv.textContent = 'Waiting for button data...';
+            }
+        });
+
+        async function readSerialData() {
+            while (port.readable && keepReading) {
+            reader = port.readable.getReader();
+            try {
+                while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                    break;
+                }
+                const text = new TextDecoder().decode(value).trim();
+                
+                // Handle multiple button states that might arrive together
+                const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+                
+                let button1Pressed = false;
+                let button2Pressed = false;
+                let statusMessage = '';
+                
+                // Process each line of data
+                lines.forEach(line => {
+                    if (line === 'p1') {
+                        button1Pressed = true;
+                    } else if (line === 'p2') {
+                        button2Pressed = true;
+                    } 
+                    
+                    // else if (line.includes('p1') && line.includes('p2')) {
+                    //     // Handle if Arduino sends combined data like "BTN1,BTN2" or "BTN1+BTN2"
+                    //     button1Pressed = true;
+                    //     button2Pressed = true;
+                    // }
+                });
+                
+                // Update status based on what buttons are pressed
+                if (button2Pressed) {
+                    // statusMessage = 'Button 2 Pressed';
+                    buttonStatusDiv.style.backgroundColor = '#2196F3';
+                    buttonStatusDiv.style.color = 'white';
+                    console.log("BTN2 PRESSED")
+
+                    p1Data += 1
+                    $("#p1Data").html(p1Data)
+
+                }
+                
+                if (button1Pressed) {
+                    // statusMessage = 'Button 1 Pressed';
+                    buttonStatusDiv.style.backgroundColor = '#4CAF50';
+                    buttonStatusDiv.style.color = 'white';
+                    console.log("BTN2 PRESSED")
+
+                    p2Data += 1
+                    $("#p2Data").html(p2Data)
+
+
+                } 
+                
+                if (statusMessage) {
+                    buttonStatusDiv.textContent = statusMessage;
+                    
+                    // Reset status after 500ms to show when buttons are released
+                    setTimeout(() => {
+                        buttonStatusDiv.textContent = 'Waiting for button data...';
+                        buttonStatusDiv.style.backgroundColor = 'white';
+                        buttonStatusDiv.style.color = '#333';
+                    }, 500);
+                }
+                }
+            } catch (error) {
+                statusDiv.textContent = `Error reading data: ${error.message}`;
+                keepReading = false;
+                port = null;
+                connectButton.textContent = 'Connect to Arduino';
+            } finally {
+                reader.releaseLock();
+            }
+            }
+        }
+
+        // Start auto-connect on page load
+        window.addEventListener('load', tryAutoConnect);
+    </script>
+    
+</body>
+</html>
